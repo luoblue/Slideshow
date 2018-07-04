@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Slideshow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        a {
+            text-decoration: none;
+        }
+        .container {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+            margin: 100px auto;
+            overflow: hidden;
+            box-shadow: 0 0 10px blueviolet;
+        }
+        .wrap {
+            position: absolute;
+            width: 13440px;
+            height: 1080px;
+            z-index: 1;
+        }
+        .container .wrap img {
+            float: left;
+            width: 1920px;
+            height: 1080px;
+        }
+        .container .buttons {
+            position: absolute;
+            right: 100px;
+            bottom: 20px;
+            z-index: 2;
+        }
+        .container .buttons span {
+            font-size: 50px;
+            margin-left: 5px;
+            display: inline-block;
+            width: 65px;
+            border-radius: 50%;
+            background-color: lightblue;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+        }
+        .container .buttons span.on {
+            background-color: brown;
+        }
+
+        .container .arrow {
+            position: absolute;
+            top: 40%;
+            color: white;
+            padding:0px 27px;
+            border-radius: 50%;
+            font-size: 100px;
+            z-index: 2;
+            display: none;
+            cursor: pointer;
+        }
+        .container .arrow:hover {
+            background-color: rgba(0,0,0,0.5);
+        }
+        .container .arrow_right {
+            right: 10px;
+        }
+        .container:hover .arrow {
+            display: block;
+        }
+        .container .arrow_left {
+            left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="wrap" style="left:-1920px;">
+            <img src="images/5.jpg">
+            <img src="images/1.jpg">
+            <img src="images/2.jpg">
+            <img src="images/3.jpg">
+            <img src="images/4.jpg">
+            <img src="images/5.jpg">
+            <img src="images/1.jpg">
+        </div>
+        <div class="buttons">
+            <span class="on">1</span>
+            <span>2</span>
+            <span>3</span>
+            <span>4</span>
+            <span>5</span>
+        </div>
+        <a class="arrow arrow_left">&lt;</a>
+        <a class="arrow arrow_right">&gt;</a>
+    </div>
+    <script>
+    // 首先获取到 wrap（因为要设置其left才能控制轮播图），然后获取到左右两个箭头，并实现手动轮播
+    var wrap = document.querySelector(".wrap");
+    var next = document.querySelector(".arrow_right");
+    var prev = document.querySelector(".arrow_left");
+    next.onclick = function () {
+        next_pic();
+    }
+    prev.onclick = function () {
+        prev_pic();
+    }
+    function next_pic () {
+        var newLeft;
+        if(wrap.style.left === "-11520px"){
+            newLeft = -3840;
+        }else{
+            newLeft = parseInt(wrap.style.left)-1920;
+        }
+        wrap.style.left = newLeft + "px";
+        // 小圆点跟随移动
+        index++;
+        if(index > 4) {index = 0;}
+        showCurrentDot();
+    }
+    function prev_pic () {
+        var newLeft;
+        if(wrap.style.left === "0px"){
+            newLeft = -7680;
+        }else{
+            newLeft = parseInt(wrap.style.left)+1920;
+        }
+        wrap.style.left = newLeft + "px";
+        // 小圆点跟随移动
+        index--;
+        if(index < 0) {index = 4;}
+        showCurrentDot();
+    }
+    // 下面实现自动播放轮播图：使用setInterval()函数
+    var timer = null;
+    function autoPlay () {
+        timer = setInterval (function () {next_pic ();},1000);
+    }
+    var container = document.querySelector(".container");
+    container.onmouseenter = function () {
+        clearInterval (timer);
+    }
+    container.onmouseleave = function () {
+        autoPlay ();
+    }
+    // 实现轮播图下方的小圆点跟随移动
+    var index = 0;
+    var dots = document.getElementsByTagName("span");
+    function showCurrentDot () {
+        for (var i=0; i<dots.length; i++) {
+            dots[i].className = "";
+        }
+        dots[index].className = "on";
+    }
+    // 实现点击小圆点时跳转到相应图片：使wrap的left变成相应的值。此函数理解的还不透彻。
+    for (var i=0; i<dots.length; i++) {
+        (function (i) {
+            dots[i].onclick = function () {
+                var dis = index - i;
+                if(index == 4 && parseInt(wrap.style.left) !== -9600){
+                    dis = dis - 5;     
+                }
+                if(index == 0 && parseInt(wrap.style.left) !== -1920){
+                    dis = 5 + dis;
+                }
+                wrap.style.left = (parseInt(wrap.style.left) +  dis * 1920)+"px";
+                index = i;
+                showCurrentDot ();
+            }
+        })(i);
+    }
+    </script>
+</body>
+</html>
